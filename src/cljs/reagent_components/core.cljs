@@ -1,20 +1,36 @@
 (ns reagent-components.core
+  (:import goog.history.Html5History
+           goog.Uri)
   (:require [reagent.core :as r :refer [atom]]
             [secretary.core :as secretary :include-macros true]
+            [goog.events :as events]
+            [goog.history.EventType :as EventType]
             [accountant.core :as accountant]
-            [reagent-components.dropdown :refer [dropdown]]))
+            [reagent-components.dropdown :refer [dropdown]]
+            [reagent-components.app-state :refer [app-state]]))
 
 ;; -------------------------
 ;; Pages
 
 (defn home-page []
   [:div [:h2 "Welcome to reagent-components"]
-   [dropdown]
-   [:div [:a {:href "/about"} "go to about page"]]])
+   [:div [:a {:href "/about"} "go to about page"]]
+   [:div [:a {:href "/dropdown"} "dropdown"]]])
 
 (defn about-page []
-  [:div [:h2 "About reagent-components"]
-   [:div [:a {:href "/"} "go to the home page"]]])
+  (def auth-state (r/cursor app-state [:auth]))
+  (if (not @auth-state)
+    (fn []
+      ; Change path
+      (accountant/navigate! "/")
+      ; Navigate to there
+      (accountant/dispatch-current!))
+    (fn []
+      [:div [:h2 "About reagent-components"]
+       [:div [:a {:href "/"} "go to the home page"]]
+       (println "well i was here")])))
+
+[dropdown]
 
 ;; -------------------------
 ;; Routes
@@ -29,6 +45,9 @@
 
 (secretary/defroute "/about" []
                     (reset! page #'about-page))
+
+(secretary/defroute "/dropdown" []
+                    (reset! page #'dropdown))
 
 ;; -------------------------
 ;; Initialize app

@@ -7,4 +7,5 @@
                                     :name "työstö"}
                                    {:id 666
                                     :name "not-työstö"}]
-                        :current-mod ""}))
+                        :current-mod ""
+                        :auth false}))
